@@ -1,0 +1,136 @@
+Question- https://leetcode.com/problems/set-matrix-zeroes/
+Given an m x n integer matrix matrix, if an element is 0, set its entire row and column to 0's.
+Example 1:
+
+Input: matrix = [[1,1,1],[1,0,1],[1,1,1]]
+Output: [[1,0,1],[0,0,0],[1,0,1]]
+Example 2:
+
+Input: matrix = [[0,1,2,0],[3,4,5,2],[1,3,1,5]]
+Output: [[0,0,0,0],[0,4,5,0],[0,3,1,0]]
+ 
+
+Constraints:
+
+m == matrix.length
+n == matrix[0].length
+1 <= m, n <= 200
+-231 <= matrix[i][j] <= 231 - 1
+ 
+
+Follow up:
+
+A straightforward solution using O(mn) space is probably a bad idea.
+A simple improvement uses O(m + n) space, but still not the best solution.
+Could you devise a constant space solution?
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Intution-
+matrix mein koi zero milta hai, toh us zero ke saath saara row aur column ko zero karna hai
+Ek simple approach ye ho sakti hai ki jaise hi tumhe zero mile, turant uske row aur column ko zero kar do. 
+Lekin isme dikkat ye ho sakti hai ki tum accidentally aise zeros ko bhi overwrite kar sakte ho jo baad mein set hone chahiye.
+Ek optimized approach mein, hum pehle un rows aur columns ko mark karte hain jinko zero karna hai, 
+aur fir matrix ko dusri baar traverse karke unko zero set karte hain
+
+Brute Force Approach:
+Brute force approach mein tum matrix ko traverse karoge, aur jahan bhi zero milega, turant uske row aur column ko zero set kar doge.
+
+SOLUTION:
+ public void setZeroes(int[][] matrix) {
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (matrix[i][j] == 0) {
+                // Set entire row to a marker value (except the zero itself)
+                for (int k = 0; k < cols; k++) {
+                    if (matrix[i][k] != 0) {
+                        matrix[i][k] = Integer.MIN_VALUE; // Marker value
+                    }
+                }
+                // Set entire column to a marker value (except the zero itself)
+                for (int k = 0; k < rows; k++) {
+                    if (matrix[k][j] != 0) {
+                        matrix[k][j] = Integer.MIN_VALUE; // Marker value
+                    }
+                }
+            }
+        }
+    }
+
+    // Replace all marker values with zero
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (matrix[i][j] == Integer.MIN_VALUE) {
+                matrix[i][j] = 0;
+            }
+        }
+    }
+}
+
+
+//optimize
+public void setZeroes(int[][] matrix) {  
+    int rows = matrix.length;                    //Yahan pehle hum matrix ki rows aur columns ka size nikal rahe hain. 
+    int cols = matrix[0].length;                 //phir do boolean variables (firstRowZero aur firstColZero) bana rahe hain, 
+                                                 //jismein hum store karenge ki kya pehli row ya pehla column mein koi zero hai ya nahi.
+    boolean firstRowZero = false;
+    boolean firstColZero = false;
+
+    
+    // Check if the first row has a zero
+    for (int j = 0; j < cols; j++) {             //Is loop mein, hum check kar rahe hain ki kya pehli row mein koi zero hai. 
+        if (matrix[0][j] == 0) {
+            firstRowZero = true;                 //Agar humein koi zero milta hai, toh hum firstRowZero = true set kar dete hain, aur loop se bahar aa jaate hain.
+            break;
+        }
+    }
+
+    // Check if the first column has a zero
+    for (int i = 0; i < rows; i++) {             //Is dusre loop mein, hum check kar rahe hain ki kya pehle column mein koi zero hai.
+        if (matrix[i][0] == 0) {
+            firstColZero = true;                 // Agar humein koi zero milta hai, toh hum firstColZero = true set kar dete hain, aur loop se bahar aa jaate hain.
+            break;
+        }
+    }
+
+    // Use first row and first column as markers
+    //Ab hum matrix ke baaki elements (pehli row aur pehla column ke alawa) ko traverse karte hain. Agar humein koi zero milta hai, 
+    //toh hum us row ke pehle element aur us column ke pehle element ko zero set kar dete hain. 
+    //Is tarah se hum first row aur first column ko markers ki tarah use kar rahe hain.
+
+    for (int i = 1; i < rows; i++) {
+        for (int j = 1; j < cols; j++) {  
+            if (matrix[i][j] == 0) {
+                matrix[i][0] = 0;
+                matrix[0][j] = 0;
+            }
+        }
+    }
+
+    // Set matrix elements to zero based on the markers
+    //Ab hum matrix ko dobara traverse karte hain, lekin sirf un elements ke liye jinka row aur column pehle element ya to matrix[i][0] ya matrix[0][j] zero hai. 
+    //Agar in dono mein se koi bhi zero hai, toh hum us element ko zero set kar dete hain.
+    for (int i = 1; i < rows; i++) {
+        for (int j = 1; j < cols; j++) {
+            if (matrix[i][0] == 0 || matrix[0][j] == 0) {
+                matrix[i][j] = 0;
+            }
+        }
+    }
+
+    // Set first row to zero if needed
+    if (firstRowZero) {
+        for (int j = 0; j < cols; j++) {
+            matrix[0][j] = 0;
+        }
+    }
+
+    // Set first column to zero if needed
+    if (firstColZero) {
+        for (int i = 0; i < rows; i++) {
+            matrix[i][0] = 0;
+        }
+    }
+}
+}
